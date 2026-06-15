@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salt & Fortune</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Special+Elite&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Game styles-->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- ═══════════════════════════════════
+       SCREEN: TITLE
+  ════════════════════════════════════ -->
+  <div id="screen-title" class="sf-screen d-flex flex-column align-items-center justify-content-center">
+    <div class="title-bg"></div>
+    <div class="rain-overlay"></div>
+
+    <div class="title-content text-center position-relative">
+      <h1 class="title-main">Salt &amp; Fortune</h1>
+      <p class="title-sub">The Hargrove Estate Mystery</p>
+      <div class="title-divider">◆</div>
+      <p class="title-blurb fst-italic">
+        Octavia Milagro was summoned to the will reading of a man she's never met <br>
+        Follow her as she makes decisions that will change the course of her life.
+      </p>
+      <div class="d-flex flex-column align-items-center gap-3 mt-3">
+        <button class="btn sf-btn-primary px-5" onclick="Game.start()">Begin Investigation</button>
+        <button class="btn sf-btn-secondary px-4" onclick="showScreen('screen-guide')">Physics Guide</button>
+      </div>
+    </div>
+
+    <span class="corner-decor top-left">❧</span>
+    <span class="corner-decor top-right">❧</span>
+    <span class="corner-decor bottom-left">❧</span>
+    <span class="corner-decor bottom-right">❧</span>
+  </div>
+
+
+  <!-- ═══════════════════════════════════
+       SCREEN: PHYSICS GUIDE
+  ════════════════════════════════════ -->
+  <div id="screen-guide" class="sf-screen d-none flex-column align-items-center overflow-auto py-5 px-3">
+    <div style="max-width:900px; width:100%;">
+      <button class="btn sf-btn-back mb-3" onclick="showScreen('screen-title')">← Back</button>
+      <h2 class="guide-title text-center mb-4">Physics Concepts in This Game</h2>
+      <div class="row g-4" id="physics-guide-grid">
+        <!-- Populated by physics.js on DOMContentLoaded -->
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════
+       SCREEN: GAME
+  ════════════════════════════════════ -->
+  <div id="screen-game" class="sf-screen d-none">
+
+    <!-- Two-column layout: scene image left, dialogue panel right -->
+    <div class="d-flex w-100 h-100">
+
+      <!-- LEFT: Scene image -->
+      <div class="scene-panel position-relative flex-grow-1 overflow-hidden">
+        <img id="scene-bg" src="" alt="" class="scene-bg w-100 h-100">
+        <div class="scene-overlay position-absolute top-0 start-0 w-100 h-100"></div>
+        <div class="scene-name-tag position-absolute" id="scene-name"></div>
+      </div>
+
+      <!-- RIGHT: Dialogue panel -->
+      <div class="dialogue-panel d-flex flex-column position-relative" style="width:420px; flex-shrink:0;">
+
+        <!-- Top accent bar -->
+        <div class="dialogue-accent-bar"></div>
+
+        <!-- Case notes tab -->
+        <button class="btn sf-tab-btn position-absolute top-0 end-0 mt-2 me-2" onclick="openModal('modal-notes')">Case Notes</button>
+
+        <!-- Speaker name -->
+        <div class="speaker-label mt-4 mb-1" id="speaker-label"></div>
+
+        <!-- Dialogue text — click to skip typewriter -->
+        <div class="dialogue-box flex-grow-1 overflow-auto p-3 mb-3" id="dialogue-box">
+          <p id="dialogue-text" class="mb-0"></p>
+        </div>
+
+        <!-- Choices -->
+        <div class="d-flex flex-column gap-2" id="choices-container"></div>
+
+        <!-- Bottom bar -->
+        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top sf-border">
+          <button class="btn sf-tab-btn" onclick="openModal('modal-inventory')">
+            Evidence (<span id="inv-count">0</span>)
+          </button>
+          <span class="chapter-indicator" id="chapter-indicator">Chapter 1</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════
+       SCREEN: ENDING
+  ════════════════════════════════════ -->
+  <div id="screen-ending" class="sf-screen d-none flex-column align-items-center justify-content-center overflow-auto p-4">
+    <div id="ending-container" style="max-width:640px; width:100%;"></div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════
+       BOOTSTRAP Physics Puzzle
+  ════════════════════════════════════ -->
+  <div class="modal fade" id="modal-physics" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content sf-modal-content">
+
+        <div class="modal-header border-0 pb-0">
+          <div class="d-flex align-items-center gap-2">
+            <h5 class="modal-title sf-modal-title" id="physics-title">Physics Analysis</h5>
+          </div>
+        </div>
+
+        <div class="modal-body pt-2">
+          <div class="physics-narrative mb-3" id="physics-content"></div>
+          <div class="physics-equation-box mb-3" id="physics-equation"></div>
+          <div class="physics-conclusion p-3" id="physics-conclusion"></div>
+        </div>
+
+        <div class="modal-footer border-0 pt-0">
+          <button class="btn sf-btn-primary w-100" id="physics-close-btn">Add to Case Notes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════
+       BOOTSTRAP Evidence / Inventory
+  ════════════════════════════════════ -->
+  <div class="modal fade" id="modal-inventory" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content sf-modal-content">
+        <div class="modal-header border-0">
+          <h5 class="sf-modal-title">Evidence Collected</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="inventory-list">
+          <p class="text-muted fst-italic small">Nothing collected yet.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════
+       BOOTSTRAP Case Notes
+  ════════════════════════════════════ -->
+  <div class="modal fade" id="modal-notes" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content sf-modal-content">
+        <div class="modal-header border-0">
+          <h5 class="sf-modal-title">My Case Notes</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="notes-list">
+          <p class="text-muted fst-italic small">No physics notes yet. Investigate scenes to uncover clues.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Game scripts -->
+  <script src="physics.js"></script>
+  <script src="scenes.js"></script>
+  <script src="game.js"></script>
+
+</body>
+</html>

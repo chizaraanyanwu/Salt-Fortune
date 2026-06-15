@@ -1,0 +1,548 @@
+/* =============================================
+   SALT & FORTUNE — style.css
+   Bootstrap 5 base + game-specific overrides.
+
+   Z-INDEX RULES (simple, never override these):
+     Screens       → auto (normal flow, only one shown)
+     BS modals     → 1055 (Bootstrap default, correct)
+     Nothing else gets a z-index.
+   ============================================= */
+
+/* ── Tokens ──────────────────────────────── */
+:root {
+  --bg-dark:        #0d0a08;
+  --bg-panel:       #120e08;
+  --parchment:      #e8d9b8;
+  --parchment-dark: #c4a97a;
+  --gold:           #c9a84c;
+  --gold-bright:    #f0c060;
+  --crimson:        #8b1a1a;
+  --crimson-hover:  #a32020;
+  --crimson-light:  #c0392b;
+  --teal:           #2d6b6b;
+  --teal-bright:    #5aafaf;
+  --text-main:      #e8d9b8;
+  --text-dim:       #9a8a70;
+  --gold-border:    rgba(201,168,76,0.35);
+  --dim-border:     rgba(201,168,76,0.12);
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'Lora', Georgia, serif;
+  --font-mono:    'Special Elite', 'Courier New', monospace;
+}
+
+/* ── Reset ───────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;          /* screens handle their own scroll */
+  background: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-body);
+}
+
+/* ── Scrollbar ───────────────────────────── */
+::-webkit-scrollbar         { width: 4px; }
+::-webkit-scrollbar-track   { background: transparent; }
+::-webkit-scrollbar-thumb   { background: var(--gold-border); border-radius: 2px; }
+
+/* ═════════════════════════════════════════
+   SCREEN SYSTEM
+   Only one screen is visible at a time.
+   showScreen() toggles d-none ↔ d-flex.
+   No z-index needed — hidden = display:none.
+═════════════════════════════════════════ */
+.sf-screen {
+  position: fixed;
+  inset: 0;
+  /* no z-index — stacking order comes from DOM order + display:none */
+}
+
+/* ═════════════════════════════════════════
+   TITLE SCREEN
+═════════════════════════════════════════ */
+#screen-title {
+  background: var(--bg-dark);
+  overflow: hidden;
+}
+
+.title-bg {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(139,26,26,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 30%, rgba(45,107,107,0.10) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(201,168,76,0.05) 0%, transparent 40%);
+}
+
+.rain-overlay {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0px, transparent 4px,
+    rgba(180,160,120,0.03) 4px, rgba(180,160,120,0.03) 5px
+  );
+  animation: rain-scroll 0.5s linear infinite;
+}
+@keyframes rain-scroll {
+  from { background-position: 0 0; }
+  to   { background-position: 20px 20px; }
+}
+
+.title-content { animation: fadeInUp 1.2s ease both; }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.title-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.4em;
+  color: var(--gold);
+  opacity: 0.8;
+  text-transform: uppercase;
+}
+
+.title-main {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-weight: 900;
+  font-style: italic;
+  color: var(--parchment);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 80px rgba(201,168,76,0.3), 0 4px 20px rgba(0,0,0,0.8);
+  margin: 0.25rem 0;
+}
+
+.title-sub {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2vw, 1.6rem);
+  color: var(--parchment-dark);
+  letter-spacing: 0.15em;
+  font-style: italic;
+}
+
+.title-divider { 
+    color: var(--gold);
+   opacity: 0.5; 
+   font-size: 1.1rem; 
+   margin: 0.5rem 0; 
+}
+
+.title-blurb {
+  font-size: clamp(1rem, 1.4vw, 1.5rem);
+  color: var(--text-dim);
+  line-height: 1.75;
+}
+
+/* Corner ornaments */
+.corner-decor {
+  position: absolute;
+  font-size: 2.4rem;
+  color: var(--gold);
+  opacity: 0.1;
+  font-family: Georgia, serif;
+  pointer-events: none;
+  line-height: 1;
+}
+.top-left     { top:1.5rem;    left:1.5rem; }
+.top-right    { top:1.5rem;    right:1.5rem;  transform: scaleX(-1); }
+.bottom-left  { bottom:1.5rem; left:1.5rem;   transform: scaleY(-1); }
+.bottom-right { bottom:1.5rem; right:1.5rem;  transform: scale(-1,-1); }
+
+/* ══════
+   BUTTONS
+═══════ */
+.sf-btn-primary {
+  background: var(--crimson);
+  color: var(--parchment);
+  border: 1px solid var(--gold-border);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  letter-spacing: 0.07em;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+
+.sf-btn-primary:hover, .sf-btn-primary:focus {
+  background: var(--crimson-hover);
+  color: var(--parchment);
+  border-color: var(--gold);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px rgba(139,26,26,0.45);
+}
+
+.sf-btn-secondary {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--dim-border);
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  transition: color 0.2s, border-color 0.2s;
+}
+.sf-btn-secondary:hover, .sf-btn-secondary:focus {
+  color: var(--gold);
+  border-color: var(--gold-border);
+  background: transparent;
+}
+
+.sf-btn-back {
+  background: transparent;
+  color: var(--text-dim);
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  padding: 0.4rem 0;
+  transition: color 0.2s;
+}
+.sf-btn-back:hover { color: var(--gold); }
+
+/* ═════════════════════════════════════════
+   PHYSICS GUIDE SCREEN
+═════════════════════════════════════════ */
+#screen-guide { background: var(--bg-dark); }
+
+.guide-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-style: italic;
+  color: var(--gold);
+}
+
+/* Guide cards — Bootstrap col wraps these */
+.guide-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--gold-border);
+  padding: 1.4rem;
+  height: 100%;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.guide-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+.guide-card-icon  { font-size: 1.9rem; margin-bottom: 0.6rem; }
+.guide-card h4 {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--gold-bright);
+  margin-bottom: 0.4rem;
+}
+.guide-card p    { font-size: 0.83rem; color: var(--text-dim); line-height: 1.6; margin: 0; }
+.guide-card-eq {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--teal);
+  margin-top: 0.7rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--dim-border);
+}
+
+/* ═════════════════════════════════════════
+   GAME SCREEN
+═════════════════════════════════════════ */
+#screen-game { background: #080604; }
+
+/* Scene image */
+.scene-panel { background: #080604; }
+
+.scene-bg {
+  object-fit: cover;
+  opacity: 0.75;
+  transition: opacity 0.8s ease;
+  filter: sepia(0.3) contrast(1.05);
+  display: block;
+}
+
+.scene-overlay {
+  background:
+    linear-gradient(to right, transparent 55%, rgba(18,14,8,0.96) 100%),
+    linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, transparent 25%);
+  pointer-events: none;
+}
+
+.scene-name-tag {
+  bottom: 1.4rem; left: 1.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  opacity: 0.65;
+  text-transform: uppercase;
+}
+
+/* Dialogue panel — sits at the natural end of the flex row, no z-index */
+.dialogue-panel {
+  background: var(--bg-panel);
+  border-left: 1px solid var(--gold-border);
+  padding: 1.4rem;
+}
+
+.dialogue-accent-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(to right, var(--crimson), var(--gold), var(--crimson));
+  pointer-events: none;
+}
+
+.sf-border { border-color: var(--dim-border) !important; }
+
+/* Tab buttons (Case Notes, Evidence) */
+.sf-tab-btn {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--dim-border);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 0.25rem 0.55rem;
+  transition: color 0.2s, border-color 0.2s;
+}
+.sf-tab-btn:hover, .sf-tab-btn:focus {
+  color: var(--gold);
+  border-color: var(--gold-border);
+  background: transparent;
+}
+
+.speaker-label {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--gold-bright);
+  min-height: 1.4em;
+  letter-spacing: 0.05em;
+}
+
+.dialogue-box {
+  background: rgba(0,0,0,0.22);
+  border: 1px solid var(--dim-border);
+  cursor: pointer;         /* signals "click to skip" */
+}
+
+#dialogue-text {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  line-height: 1.85;
+  color: var(--text-main);
+  white-space: pre-wrap;
+}
+
+/* Typing cursor */
+#dialogue-text.typing::after {
+  content: '▋';
+  color: var(--gold);
+  animation: blink 0.8s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* Choice buttons */
+.choice-btn {
+  background: transparent;
+  border: 1px solid var(--dim-border);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 0.84rem;
+  padding: 0.65rem 1rem 0.65rem 1.4rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+  position: relative;
+  line-height: 1.5;
+  width: 100%;
+}
+.choice-btn::before {
+  content: '›';
+  position: absolute;
+  left: 0.5rem;
+  color: var(--gold);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.choice-btn:hover {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.05);
+  color: var(--parchment);
+}
+.choice-btn:hover::before { opacity: 1; }
+
+/* Physics-trigger variant */
+.choice-btn.physics-trigger { border-color: rgba(45,107,107,0.45); color: var(--teal); }
+.choice-btn.physics-trigger::before { color: var(--teal); }
+.choice-btn.physics-trigger:hover {
+  border-color: var(--teal);
+  background: rgba(45,107,107,0.08);
+  color: var(--teal-bright);
+}
+
+.chapter-indicator {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+/* ═════════════════════════════════════════
+   BOOTSTRAP MODAL OVERRIDES
+   Bootstrap handles z-index (1055).
+   We just style the content.
+═════════════════════════════════════════ */
+.sf-modal-content {
+  background: var(--bg-panel);
+  border: 1px solid var(--gold);
+  color: var(--text-main);
+  border-radius: 0;
+}
+
+.sf-modal-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-style: italic;
+  color: var(--gold-bright);
+  margin: 0;
+}
+
+/* Top accent on physics modal */
+#modal-physics .sf-modal-content::before {
+  content: '';
+  display: block;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--teal), transparent);
+}
+
+.physics-narrative {
+  font-size: 0.88rem;
+  line-height: 1.85;
+  color: var(--text-main);
+  font-style: italic;
+  border-left: 2px solid var(--gold-border);
+  padding-left: 1rem;
+}
+
+.physics-equation-box {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(45,107,107,0.4);
+  padding: 0.9rem 1.1rem;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--teal-bright);
+  line-height: 1.9;
+  white-space: pre-wrap;
+}
+
+.physics-conclusion {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-style: italic;
+  color: var(--crimson-light);
+  border: 1px solid rgba(139,26,26,0.3);
+  background: rgba(139,26,26,0.05);
+}
+
+/* Evidence items */
+.evidence-item {
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--dim-border);
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+}
+.evidence-item:last-child { border-bottom: none; }
+.evidence-icon  { font-size: 1.5rem; flex-shrink: 0; }
+.evidence-label { font-family: var(--font-mono); font-size: 1rem; color: var(--gold); display: block; margin-bottom: 0.15rem; }
+.evidence-desc  { font-size: 0.8rem; color: var(--text-dim); line-height: 1.5; }
+
+/* Case note items */
+.note-item {
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--dim-border);
+  font-family: var(--font-mono);
+  font-size: 0.90rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+.note-item:last-child { border-bottom: none; }
+.note-topic { color: var(--teal); font-size: 0.88rem; letter-spacing: 0.14em; display: block; margin-bottom: 0.15rem; }
+
+/* ═════════════════════════════════════════
+   ENDING SCREEN
+═════════════════════════════════════════ */
+#screen-ending { background: var(--bg-dark); }
+
+.ending-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  letter-spacing: 0.4em;
+  color: var(--gold);
+  margin-bottom: 1.25rem;
+}
+
+.ending-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-style: italic;
+  font-weight: 900;
+  color: var(--parchment);
+  line-height: 1.1;
+  margin-bottom: 1.25rem;
+}
+
+.ending-text {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.95;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-bottom: 1.75rem;
+}
+
+.ending-recap-box {
+  background: var(--bg-panel);
+  border: 1px solid var(--gold-border);
+  padding: 1.4rem;
+  text-align: left;
+  margin-bottom: 1.75rem;
+}
+.ending-recap-box h4 {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--gold);
+  margin-bottom: 0.9rem;
+  font-size: 1.5rem;
+}
+.recap-item {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--dim-border);
+  font-size: 1rem;
+  color: var(--text-dim);
+}
+.recap-item:last-child { border-bottom: none; }
+.recap-icon  { font-size: 1rem; flex-shrink: 0; }
+.recap-label { font-family: var(--font-mono); font-size: 1rem; color: var(--gold-bright); }
+
+/* Fade-in for ending */
+.sf-fadein { animation: fadeInUp 0.9s ease both; }
+
+/* ═════════════════════════════════════════
+   RESPONSIVE
+═════════════════════════════════════════ */
+@media (max-width: 768px) {
+  #screen-game .d-flex { flex-direction: column; }
+
+  .scene-panel { height: 38vh; flex-grow: 0 !important; }
+  .scene-overlay {
+    background:
+      linear-gradient(to bottom, transparent 45%, rgba(18,14,8,0.97) 100%);
+  }
+
+  .dialogue-panel {
+    width: 100% !important;
+    border-left: none;
+    border-top: 1px solid var(--gold-border);
+  }
+}
